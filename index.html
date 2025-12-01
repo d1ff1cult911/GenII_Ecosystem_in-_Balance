@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Экосистема в балансе</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      // reserved for future light libs via esm.sh if needed
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="top-left">
+        <span id="day">День 1</span>
+        <span id="health">Здоровье: 100%</span>
+      </div>
+      <div class="top-right">
+        <button id="pauseBtn" class="icon-btn" aria-label="Пауза">⏸</button>
+        <button id="speedDownBtn" class="icon-btn" aria-label="Медленнее">–</button>
+        <span id="speedLabel">x1</span>
+        <button id="speedUpBtn" class="icon-btn" aria-label="Быстрее">+</button>
+        <button id="settingsBtn" class="icon-btn" aria-label="Настройки">⚙️</button>
+        <button id="threatsBtn" class="icon-btn" aria-label="Угрозы">⚠️</button>
+        <button id="infoBtn" class="icon-btn" aria-label="Инфо">ℹ️</button>
+        <button id="healthBtn" class="icon-btn" aria-label="Здоровье">❤</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <aside class="panel left">
+        <div class="meter">
+          <div class="label">Темп.</div>
+          <div class="value"><span id="tempVal">20°C</span></div>
+          <div class="controls">
+            <button data-act="temp-" class="mini">-</button>
+            <button data-act="temp+" class="mini">+</button>
+          </div>
+        </div>
+        <div class="meter">
+          <div class="label">Влажн.</div>
+          <div class="value"><span id="humVal">60%</span></div>
+          <div class="controls">
+            <button data-act="hum-" class="mini">-</button>
+            <button data-act="hum+" class="mini">+</button>
+          </div>
+        </div>
+        <div class="meter">
+          <div class="label">O₂</div>
+          <div class="value"><span id="o2Val">0</span></div>
+        </div>
+        <div class="meter">
+          <div class="label">Почва</div>
+          <div class="value"><span id="soilVal">70%</span></div>
+        </div>
+        <div class="meter">
+          <div class="label">Вода</div>
+          <div class="value"><span id="waterVal">50</span></div>
+        </div>
+      </aside>
+
+      <section class="viz">
+        <canvas id="vizCanvas"></canvas>
+        <div class="pop-bar" id="popBar"></div>
+      </section>
+
+      <aside class="panel right">
+        <div class="resources">
+          <div>Очки: <span id="apVal">0</span></div>
+          <div>Бюджет: <span id="budgetVal">0</span></div>
+        </div>
+        <div class="actions">
+          <button class="action" data-add="plant:grass" data-ap="20" data-bud="100">+ Растение: Трава <span class="cost">(AP20 / ₽100)</span></button>
+          <button class="action" data-add="plant:shrub" data-ap="20" data-bud="100">+ Растение: Кустарник <span class="cost">(AP20 / ₽100)</span></button>
+          <button class="action" data-add="plant:tree" data-ap="20" data-bud="100">+ Растение: Дерево <span class="cost">(AP20 / ₽100)</span></button>
+          <button class="action" data-add="herb:rabbit" data-ap="30" data-bud="200">+ Травоядное: Заяц <span class="cost">(AP30 / ₽200)</span></button>
+          <button class="action" data-add="herb:deer" data-ap="30" data-bud="200">+ Травоядное: Олень <span class="cost">(AP30 / ₽200)</span></button>
+          <button class="action" data-add="pred:fox" data-ap="50" data-bud="300">+ Хищник: Лиса <span class="cost">(AP50 / ₽300)</span></button>
+          <button class="action" data-add="pred:wolf" data-ap="50" data-bud="300">+ Хищник: Волк <span class="cost">(AP50 / ₽300)</span></button>
+          <button id="mitigateBtn" class="action warn" disabled>Устранить угрозу</button>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="charts">
+      <div class="chart-legend">
+        <div class="chart-title">Популяции (цветные линии — виды)</div>
+      </div>
+      <canvas id="popChart"></canvas>
+      <div class="chart-legend">
+        <div class="chart-title">Параметры среды (темп., влажн., O₂, здоровье)</div>
+        <div class="chart-keys">
+          <span class="key temp">— Температура</span>
+          <span class="key hum">— Влажность</span>
+          <span class="key o2">— O₂</span>
+          <span class="key health">— Здоровье</span>
+        </div>
+      </div>
+      <canvas id="envChart"></canvas>
+    </footer>
+
+    <div id="toasts"></div>
+
+    <div id="startScreen" class="start-screen">
+      <div class="start-card">
+        <h2>Экосистема в балансе</h2>
+        <p>Вы управляете параметрами среды — температура, влажность и виды. Наблюдайте за индикаторами и балансируйте экосистему.</p>
+        <div class="start-actions">
+          <button id="startBtn" class="action">Начать игру</button>
+          <button id="startTutorialBtn" class="action warn">Начать с обучения</button>
+        </div>
+        <div class="start-hint">Совет: используйте кнопки слева и добавляйте виды справа.</div>
+      </div>
+    </div>
+
+    <div id="modal" class="modal hidden">
+      <div class="sheet">
+        <div class="sheet-header">
+          <span id="modalTitle"></span>
+          <button id="modalClose" class="icon-btn">✕</button>
+        </div>
+        <div id="modalBody" class="sheet-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
